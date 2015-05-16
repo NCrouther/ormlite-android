@@ -4,10 +4,10 @@
 	<!-- ormlite configuration file for Maven (http://maven.apache.org/) -->
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.j256.ormlite</groupId>
-	<artifactId>ormlite-android</artifactId>
+	<artifactId>ormlite-android-parent</artifactId>
 	<version>4.49-SNAPSHOT</version>
-	<packaging>jar</packaging>
-	<name>ORMLite Android</name>
+	<packaging>pom</packaging>
+	<name>ORMLite Android (Parent)</name>
 	<url>http://ormlite.sourceforge.net/</url>
 	<description>Lightweight Object Relational Model (ORM) Android classes</description>
 	<licenses>
@@ -22,6 +22,10 @@
 		<artifactId>oss-parent</artifactId>
 		<version>7</version>
 	</parent>
+	<modules>
+		<module>core</module>
+		<module>processor</module>
+	</modules>
 	<scm>
 		<url>https://github.com/j256/ormlite-android</url>
 		<connection>scm:git:ssh://git@github.com/j256/ormlite-android.git</connection>
@@ -116,82 +120,18 @@
 		</profile>
 	</profiles>
 	<build>
-		<finalName>ormlite-android</finalName>
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-			</resource>
-		</resources>
-		<testResources>
-			<testResource>
-				<directory>src/test/resources</directory>
-			</testResource>
-		</testResources>
-		<plugins>
-			<!-- copied from the sonatype stuff so we can override the params -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-release-plugin</artifactId>
-				<configuration>
-					<mavenExecutorId>forked-path</mavenExecutorId>
-					<useReleaseProfile>false</useReleaseProfile>
-					<arguments>-Psonatype-oss-release -DgpgPhase=${gpgPhase} -Dgpg.passphrase=${gpg.passphrase}</arguments>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.1</version>
-				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
-				</configuration>
-				<executions>
-					<execution>
-						<id>default-compile</id>
-						<configuration>
-							<compilerArgument>-proc:none</compilerArgument>
-							<includes>
-								<include>com/j256/ormlite/android/processor/OrmLiteAnnotationProcessor.java</include>
-							</includes>
-						</configuration>
-					</execution>
-					<execution>
-						<id>compile-everything-else</id>
-						<phase>compile</phase>
-						<goals>
-							<goal>compile</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.1</version>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<version>2.1.2</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>jar</goal>
-							<goal>test-jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
+	    <finalName>ormlite-android-parent</finalName>
+	    <plugins>
+       		<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>2.7</version>
 				<executions>
 					<execution>
 						<goals>
-							<goal>jar</goal>
+							<goal>aggregate-jar</goal>
 						</goals>
+						<phase>install</phase>
 						<configuration>
 							<showPackage>false</showPackage>
 							<additionalparam>-tag inheritDoc:X</additionalparam>
@@ -210,132 +150,17 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-eclipse-plugin</artifactId>
-				<version>2.8</version>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.3.1</version>
-				<configuration>
-					<archive>
-						<manifestEntries>
-							<Application-Version>${appVersion}</Application-Version>
-						</manifestEntries>
-					</archive>
-				</configuration>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.1.2</version>
 				<executions>
 					<execution>
 						<goals>
-							<goal>test-jar</goal>
+							<goal>aggregate</goal>
 						</goals>
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>cobertura-maven-plugin</artifactId>
-				<version>2.4</version>
-			</plugin>
-			<plugin>
-				<groupId>com.google.code.maven-replacer-plugin</groupId>
-				<artifactId>replacer</artifactId>
-				<version>1.5.0</version>
-				<executions>
-					<execution>
-						<id>validate</id>
-						<phase>validate</phase>
-						<goals>
-							<goal>replace</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>prepare-package</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>replace</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<ignoreMissingFile>false</ignoreMissingFile>
-					<file>src/main/java/com/j256/ormlite/android/AndroidDatabaseConnection.java</file>
-					<outputFile>src/main/java/com/j256/ormlite/android/AndroidDatabaseConnection.java</outputFile>
-					<regex>true</regex>
-					<token>(VERSION__).*(__)</token>
-					<value>$1${version}$2</value>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<version>2.3</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-						<configuration>
-							<artifactSet>
-								<includes>
-									<include>com.squareup:javapoet</include>
-								</includes>
-							</artifactSet>
-							<minimizeJar>true</minimizeJar>
-							<relocations>
-								<relocation>
-									<pattern>com.squareup.javapoet</pattern>
-									<shadedPattern>com.j256.ormlite.android.processor.javapoet</shadedPattern>
-								</relocation>
-							</relocations>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-		<pluginManagement>
-			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>com.google.code.maven-replacer-plugin</groupId>
-										<artifactId>replacer</artifactId>
-										<versionRange>[1.5.0,)</versionRange>
-										<goals>
-											<goal>replace</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore />
-									</action>
-								</pluginExecution>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>org.apache.maven.plugins</groupId>
-										<artifactId>maven-enforcer-plugin</artifactId>
-										<versionRange>[1.0,)</versionRange>
-										<goals>
-											<goal>enforce</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore />
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
+	    </plugins>
 	</build>
 	<properties>
 		<!-- default empty string that can be overridden on command line. due to surefire's parser bug, if we don't have this here 
@@ -353,94 +178,4 @@
 		<log4j-version>1.2.15</log4j-version>
 		<ormlite-version>${project.version}</ormlite-version>
 	</properties>
-	<dependencies>
-		<!-- =================================================================== -->
-		<!-- main dependencies -->
-		<dependency>
-			<groupId>com.j256.ormlite</groupId>
-			<artifactId>ormlite-core</artifactId>
-			<version>${ormlite-version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.google.android</groupId>
-			<artifactId>android</artifactId>
-			<scope>provided</scope>
-			<version>${android-version}</version>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>com.google.android</groupId>
-			<artifactId>support-v4</artifactId>
-			<scope>provided</scope>
-			<version>${android-support-version}</version>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>com.squareup</groupId>
-			<artifactId>javapoet</artifactId>
-			<version>1.0.0</version>
-		</dependency>
-
-		<!-- =================================================================== -->
-		<!-- test dependencies -->
-		<dependency>
-			<groupId>com.j256.ormlite</groupId>
-			<artifactId>ormlite-core</artifactId>
-			<version>${ormlite-version}</version>
-			<classifier>tests</classifier>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging</artifactId>
-			<version>${commons-logging-version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>${log4j-version}</version>
-			<scope>test</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>com.sun.jmx</groupId>
-					<artifactId>jmxri</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>com.sun.jdmk</groupId>
-					<artifactId>jmxtools</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>javax.activation</groupId>
-					<artifactId>activation</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>javax.jms</groupId>
-					<artifactId>jms</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>javax.mail</groupId>
-					<artifactId>mail</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>${junit-version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.easymock</groupId>
-			<artifactId>easymock</artifactId>
-			<version>${easymock-version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.google.testing.compile</groupId>
-			<artifactId>compile-testing</artifactId>
-			<version>0.6</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
 </project>
