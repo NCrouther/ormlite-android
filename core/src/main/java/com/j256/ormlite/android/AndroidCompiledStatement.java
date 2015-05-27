@@ -91,7 +91,9 @@ public class AndroidCompiledStatement implements CompiledStatement {
 			try {
 				cursor.close();
 			} catch (android.database.SQLException e) {
-				throw new IOException("Problems closing Android cursor", e);
+				IOException ioe = new IOException("Problems closing Android cursor");
+				ioe.initCause(e);
+				throw ioe;
 			}
 		}
 		cancellationHook = null;
