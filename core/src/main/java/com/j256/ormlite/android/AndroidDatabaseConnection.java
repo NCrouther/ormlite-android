@@ -248,7 +248,9 @@ public class AndroidDatabaseConnection implements DatabaseConnection {
 			db.close();
 			logger.trace("{}: db {} closed", this, db);
 		} catch (android.database.SQLException e) {
-			throw new IOException("problems closing the database connection", e);
+			IOException ioe = new IOException("problems closing the database connection");
+			ioe.initCause(e);
+			throw ioe;
 		}
 	}
 
